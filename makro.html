@@ -1,0 +1,1568 @@
+<!DOCTYPE html>
+<html lang="sk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Makroekonómia — AE & IS-LM</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;1,400&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+<style>
+/* ─── TOKENS ─────────────────────────────────────────── */
+:root {
+  --nav-h: 56px;
+  --bg:    #0b0f14;
+  --bg2:   #111820;
+  --card:  #161d27;
+  --card2: #1c2533;
+  --bdr:   #232d3a;
+  --bdr2:  #2d3a4a;
+  --text:  #d4dce8;
+  --dim:   #7a8fa6;
+  --muted: #4a5a6e;
+  /* accent colours */
+  --c-c:   #f97171;   /* consumption – red  */
+  --c-i:   #4da8ff;   /* investment  – blue */
+  --c-g:   #f5b942;   /* government  – amber*/
+  --c-nx:  #a78bfa;   /* net export  – violet*/
+  /* IS-LM */
+  --is:    #58a6ff;
+  --lm:    #f78166;
+  --bp:    #3fb950;
+  --eq:    #e3b341;
+  --auto:  #c678dd;
+  --cons:  #f59e0b;
+  --gray:  #3d4f61;
+}
+
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 15px;
+  line-height: 1.7;
+}
+
+/* ─── TOP NAV ────────────────────────────────────────── */
+#top-nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: var(--nav-h);
+  z-index: 200;
+  background: rgba(11, 15, 20, 0.9);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--bdr);
+  display: flex;
+  align-items: center;
+  padding: 0 28px;
+  gap: 24px;
+}
+
+.nav-brand {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: var(--muted);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.nav-brand strong { color: var(--eq); font-weight: 600; }
+
+.nav-tabs { display: flex; gap: 4px; }
+
+.nav-tab {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  letter-spacing: .08em;
+  padding: 7px 18px;
+  border-radius: 6px;
+  cursor: pointer;
+  border: 1px solid transparent;
+  color: var(--dim);
+  transition: all .18s;
+  user-select: none;
+  white-space: nowrap;
+  text-transform: uppercase;
+}
+.nav-tab:hover { color: var(--text); background: var(--card); border-color: var(--bdr); }
+.nav-tab.active { color: var(--eq); background: var(--card); border-color: var(--eq); }
+
+/* ─── PAGE CONTAINERS ───────────────────────────────── */
+.page-view { display: none; padding-top: var(--nav-h); }
+.page-view.active { display: block; }
+
+/* ═══════════════════════════════════════════════════════
+   PAGE 1 — AE FORMULA
+═══════════════════════════════════════════════════════ */
+#page-ae { min-height: 100vh; }
+
+/* Hero */
+.ae-hero {
+  padding: 52px 40px 40px;
+  text-align: center;
+  background: linear-gradient(180deg, var(--bg2) 0%, var(--bg) 100%);
+  border-bottom: 1px solid var(--bdr);
+  position: relative;
+  overflow: hidden;
+}
+.ae-hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 60% 50% at 20% 40%, rgba(74,168,255,.06) 0%, transparent 70%),
+    radial-gradient(ellipse 50% 40% at 80% 60%, rgba(167,139,250,.05) 0%, transparent 70%);
+  pointer-events: none;
+}
+.ae-hero-kicker {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 16px;
+}
+.ae-hero h1 {
+  font-family: 'Syne', sans-serif;
+  font-size: clamp(28px, 4vw, 44px);
+  font-weight: 800;
+  color: #e8eef6;
+  letter-spacing: -.02em;
+  margin-bottom: 10px;
+}
+.ae-hero p {
+  color: var(--dim);
+  font-size: 15px;
+  max-width: 480px;
+  margin: 0 auto;
+}
+
+/* Formula bar */
+.ae-formula-bar {
+  background: var(--bg2);
+  border-bottom: 1px solid var(--bdr);
+  padding: 28px 20px;
+}
+.ae-formula-eq {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.ae-eq-lhs {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--text);
+  margin-right: 6px;
+  letter-spacing: -.01em;
+}
+.ae-eq-eq {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 22px;
+  color: var(--muted);
+  margin-right: 12px;
+}
+.ae-op {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 20px;
+  color: var(--muted);
+  margin: 0 10px;
+}
+
+/* Clickable formula blocks */
+.ae-block {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+  border-radius: 10px;
+  border: 1.5px solid var(--bdr);
+  background: var(--card);
+  padding: 10px 16px;
+  transition: all .22s cubic-bezier(.34,1.4,.64,1);
+  user-select: none;
+  min-width: 70px;
+  position: relative;
+}
+.ae-block:hover { transform: translateY(-3px); border-color: var(--bdr2); }
+
+.ae-block-letter {
+  font-family: 'Syne', sans-serif;
+  font-size: 22px;
+  font-weight: 800;
+  line-height: 1;
+}
+.ae-block-sub {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 9px;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  margin-top: 3px;
+  opacity: .6;
+}
+
+.ae-block[data-id="c"]  { --clr: var(--c-c); }
+.ae-block[data-id="i"]  { --clr: var(--c-i); }
+.ae-block[data-id="g"]  { --clr: var(--c-g); }
+.ae-block[data-id="nx"] { --clr: var(--c-nx); }
+
+.ae-block .ae-block-letter { color: var(--clr); }
+.ae-block.active {
+  background: color-mix(in srgb, var(--clr) 12%, var(--card));
+  border-color: var(--clr);
+  transform: translateY(-4px) scale(1.04);
+  box-shadow: 0 8px 24px color-mix(in srgb, var(--clr) 20%, transparent);
+}
+.ae-block-expr {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 9px;
+  color: var(--dim);
+  margin-top: 5px;
+  white-space: nowrap;
+  opacity: 0;
+  max-height: 0;
+  overflow: hidden;
+  transition: all .3s;
+}
+.ae-block.active .ae-block-expr {
+  opacity: 1;
+  max-height: 20px;
+}
+
+.ae-hint {
+  text-align: center;
+  margin-top: 14px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  letter-spacing: .12em;
+  color: var(--muted);
+  text-transform: uppercase;
+}
+
+/* Detail panels */
+.ae-panels { min-height: 460px; padding: 40px; position: relative; }
+
+.ae-panel { display: none; animation: panelIn .35s cubic-bezier(.4,0,.2,1); }
+.ae-panel.active { display: block; }
+
+@keyframes panelIn {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.ae-panel-default {
+  min-height: 400px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 16px;
+}
+.ae-panel-default .icon-ring {
+  width: 80px; height: 80px;
+  border-radius: 50%;
+  border: 2px dashed var(--bdr2);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 32px; color: var(--muted);
+  animation: spin 12s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.ae-panel-default h2 {
+  font-family: 'Syne', sans-serif;
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text);
+}
+.ae-panel-default p { color: var(--dim); max-width: 380px; }
+
+/* Panel header */
+.ae-panel-hdr {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  margin-bottom: 32px;
+}
+.ae-panel-icon {
+  width: 56px; height: 56px;
+  border-radius: 14px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px;
+  flex-shrink: 0;
+}
+.ae-panel-meta { flex: 1; }
+.ae-panel-kicker {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: var(--clr, var(--dim));
+  margin-bottom: 4px;
+}
+.ae-panel-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 24px;
+  font-weight: 700;
+  color: #e8eef6;
+  line-height: 1.2;
+}
+.ae-panel-desc { color: var(--dim); font-size: 14px; margin-top: 4px; }
+
+/* Sub-formula badge */
+.ae-subfmla {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 13px;
+  background: var(--card2);
+  border: 1px solid var(--bdr);
+  border-left: 3px solid var(--clr, var(--is));
+  padding: 10px 16px;
+  border-radius: 0 8px 8px 0;
+  color: #9fcbff;
+  margin-bottom: 28px;
+  display: inline-block;
+}
+
+/* Var cards grid */
+.ae-vars {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+  gap: 14px;
+}
+.ae-var {
+  background: var(--card);
+  border: 1px solid var(--bdr);
+  border-radius: 10px;
+  padding: 16px;
+  transition: border-color .18s;
+}
+.ae-var:hover { border-color: var(--bdr2); }
+.ae-var-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+.ae-var-sym {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 22px;
+  font-weight: 600;
+}
+.ae-var-ico {
+  font-size: 18px;
+  opacity: .35;
+}
+.ae-var h4 { font-size: 13px; font-weight: 500; color: var(--text); margin-bottom: 4px; }
+.ae-var p  { font-size: 12px; color: var(--dim); line-height: 1.55; }
+
+.ae-var.minus .ae-var-sym { color: var(--c-c); opacity: .65; }
+.ae-var.plus  .ae-var-sym { color: var(--bp);  }
+
+/* G single card */
+.ae-g-card {
+  max-width: 600px;
+  background: var(--card);
+  border: 1px solid var(--bdr);
+  border-radius: 14px;
+  padding: 32px;
+  display: flex; gap: 24px; align-items: flex-start;
+}
+.ae-g-lock { font-size: 48px; color: var(--bdr2); flex-shrink: 0; }
+.ae-g-body h3 { font-family: 'Syne', sans-serif; font-size: 18px; font-weight: 700; color: var(--c-g); margin-bottom: 10px; }
+.ae-g-body p { color: var(--dim); font-size: 14px; line-height: 1.65; }
+
+
+/* ═══════════════════════════════════════════════════════
+   PAGE 2 — IS-LM GRAPHS
+═══════════════════════════════════════════════════════ */
+#page-islm {
+  font-family: 'DM Sans', sans-serif;
+  min-height: 100vh;
+}
+
+/* sticky sub-nav */
+.islm-subnav {
+  border-bottom: 1px solid var(--bdr);
+  padding: 0 44px;
+  background: rgba(11,15,20,.92);
+  backdrop-filter: blur(10px);
+  position: sticky;
+  top: var(--nav-h);
+  z-index: 100;
+  display: flex;
+  gap: 2px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.islm-subnav::-webkit-scrollbar { display: none; }
+.islm-subnav a {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--muted);
+  text-decoration: none;
+  padding: 12px 14px;
+  border-bottom: 2px solid transparent;
+  white-space: nowrap;
+  transition: all .15s;
+  flex-shrink: 0;
+}
+.islm-subnav a:hover { color: var(--text); border-color: var(--bdr2); }
+
+/* main */
+.islm-main { max-width: 1160px; margin: 0 auto; padding: 48px 44px 80px; }
+
+.islm-section { margin-bottom: 80px; padding-top: 48px; border-top: 1px solid var(--bdr); }
+.islm-section:first-child { border-top: none; padding-top: 0; }
+
+/* section header */
+.sec-num {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  letter-spacing: .2em;
+  color: var(--muted);
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+.islm-section h2 {
+  font-family: 'Syne', sans-serif;
+  font-size: clamp(20px, 2.5vw, 28px);
+  font-weight: 800;
+  letter-spacing: -.02em;
+  color: #e8eef6;
+  margin-bottom: 6px;
+}
+.sec-sub {
+  color: var(--dim);
+  font-size: 14px;
+  font-style: italic;
+  margin-bottom: 32px;
+}
+
+/* two / three / four columns */
+.cols-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 36px; align-items: start; }
+.cols-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 22px; }
+.cols-4 { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+
+/* graph card */
+.gc {
+  background: var(--card);
+  border: 1px solid var(--bdr);
+  border-radius: 8px;
+  padding: 18px;
+}
+.gt {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 9px;
+  letter-spacing: .12em;
+  color: var(--muted);
+  margin-bottom: 12px;
+  text-transform: uppercase;
+}
+.islm-main svg { width: 100%; height: auto; display: block; }
+
+/* formula block */
+.fmla {
+  font-family: 'IBM Plex Mono', monospace;
+  background: var(--card);
+  border: 1px solid var(--bdr);
+  border-left: 3px solid var(--is);
+  padding: 10px 16px;
+  margin: 14px 0;
+  font-size: 13px;
+  color: #79c0ff;
+  border-radius: 0 6px 6px 0;
+}
+.fmla.lm  { border-left-color: var(--lm); }
+.fmla.bp  { border-left-color: var(--bp); }
+.fmla.eq  { border-left-color: var(--eq); }
+
+/* step cards — replaces dense paragraphs */
+.steps {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 18px 0;
+}
+.step {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  background: var(--card);
+  border: 1px solid var(--bdr);
+  border-radius: 8px;
+  padding: 14px 16px;
+  transition: border-color .15s;
+}
+.step:hover { border-color: var(--bdr2); }
+.step-num {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--is);
+  background: color-mix(in srgb, var(--is) 12%, var(--card));
+  border: 1px solid color-mix(in srgb, var(--is) 25%, transparent);
+  border-radius: 6px;
+  padding: 3px 8px;
+  flex-shrink: 0;
+  margin-top: 1px;
+  letter-spacing: .05em;
+}
+.step.lm .step-num  { color: var(--lm); background: color-mix(in srgb, var(--lm) 12%, var(--card)); border-color: color-mix(in srgb, var(--lm) 25%, transparent); }
+.step.bp .step-num  { color: var(--bp); background: color-mix(in srgb, var(--bp) 12%, var(--card)); border-color: color-mix(in srgb, var(--bp) 25%, transparent); }
+.step-body { flex: 1; }
+.step-body strong { color: var(--text); font-weight: 500; }
+.step-body em { color: var(--eq); font-style: normal; }
+
+/* key point box */
+.kp {
+  background: var(--card);
+  border: 1px solid var(--bdr);
+  border-left: 3px solid var(--eq);
+  padding: 14px 18px;
+  margin: 16px 0;
+  border-radius: 0 8px 8px 0;
+  font-size: 14px;
+  color: var(--dim);
+  line-height: 1.65;
+}
+.kp strong { color: var(--eq); }
+
+/* result badge */
+.rbadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 4px 12px;
+  border-radius: 20px;
+  margin: 6px 4px 6px 0;
+}
+.rbadge.up   { background: color-mix(in srgb, var(--bp) 15%, transparent); color: var(--bp); border: 1px solid color-mix(in srgb, var(--bp) 30%, transparent); }
+.rbadge.down { background: color-mix(in srgb, var(--c-c) 15%, transparent); color: var(--c-c); border: 1px solid color-mix(in srgb, var(--c-c) 30%, transparent); }
+.rbadge.mix  { background: color-mix(in srgb, var(--eq) 15%, transparent); color: var(--eq); border: 1px solid color-mix(in srgb, var(--eq) 30%, transparent); }
+
+/* shift cards */
+.shift-card {
+  background: var(--card);
+  border: 1px solid var(--bdr);
+  border-radius: 8px;
+  overflow: hidden;
+}
+.shift-card-hdr {
+  padding: 10px 14px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 9px;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.shift-card-hdr.is-hdr { background: color-mix(in srgb, var(--is) 8%, var(--card)); border-bottom: 1px solid color-mix(in srgb, var(--is) 20%, transparent); color: var(--is); }
+.shift-card-hdr.lm-hdr { background: color-mix(in srgb, var(--lm) 8%, var(--card)); border-bottom: 1px solid color-mix(in srgb, var(--lm) 20%, transparent); color: var(--lm); }
+.shift-card-svg { padding: 0; }
+.shift-card-body {
+  padding: 12px 14px;
+  border-top: 1px solid var(--bdr);
+}
+.shift-card-body .cause {
+  font-size: 11px;
+  color: var(--dim);
+  margin-bottom: 6px;
+}
+.shift-card-body .effect {
+  font-size: 11px;
+  color: var(--dim);
+  margin-bottom: 8px;
+}
+.shift-card-body strong { color: var(--text); }
+
+/* summary row at bottom of shifts */
+.sc {
+  background: var(--card);
+  border: 1px solid var(--bdr);
+  border-radius: 8px;
+  padding: 16px;
+}
+.sc.is { border-top: 2px solid var(--is); }
+.sc.lm { border-top: 2px solid var(--lm); }
+.sc h4 {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  letter-spacing: .06em;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+}
+.sc.is h4 { color: var(--is); }
+.sc.lm h4 { color: var(--lm); }
+.sc p { font-size: 13px; color: var(--dim); margin: 0; line-height: 1.6; }
+.sc p strong { color: var(--text); }
+
+/* legend */
+.leg  { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 10px; }
+.li   { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--dim); font-family: 'IBM Plex Mono', monospace; }
+.ll   { width: 20px; height: 2px; flex-shrink: 0; border-radius: 2px; }
+
+/* body text */
+.islm-main p { margin-bottom: 12px; font-size: 14px; color: var(--dim); }
+.islm-main p strong { color: var(--text); font-weight: 500; }
+.islm-main h3 {
+  font-family: 'Syne', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  color: #d4dce8;
+  margin: 20px 0 8px;
+  letter-spacing: .01em;
+}
+
+/* footer */
+#page-islm footer {
+  border-top: 1px solid var(--bdr);
+  padding: 24px 44px;
+  color: var(--muted);
+  font-size: 11px;
+  font-family: 'IBM Plex Mono', monospace;
+  letter-spacing: .08em;
+}
+
+/* ─── RESPONSIVE ─────────────────────────────────────── */
+@media (max-width: 900px) {
+  .cols-2, .cols-3, .cols-4 { grid-template-columns: 1fr; }
+  .islm-main { padding: 32px 20px 60px; }
+  .islm-subnav { padding: 0 16px; }
+  .ae-panels { padding: 28px 20px; }
+  .ae-hero { padding: 40px 20px 28px; }
+}
+</style>
+</head>
+<body>
+
+<!-- ════════════════════════════════════════════════
+     TOP NAVIGATION
+════════════════════════════════════════════════ -->
+<div id="top-nav">
+  <div class="nav-brand">Makro<strong>·</strong>OPF SLU</div>
+  <div class="nav-tabs">
+    <div class="nav-tab active" onclick="switchView('ae')" id="tab-ae">⊞ &nbsp;Vzorec AE</div>
+    <div class="nav-tab" onclick="switchView('islm')" id="tab-islm">∿ &nbsp;IS-LM Grafy</div>
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════════════════════
+     PAGE 1 — AE FORMULA
+════════════════════════════════════════════════ -->
+<div id="page-ae" class="page-view active">
+
+  <!-- Hero -->
+  <div class="ae-hero">
+    <div class="ae-hero-kicker">Makroekonómia · Model otvorenej ekonomiky</div>
+    <h1>Agregátne výdavky (AE)</h1>
+    <p>Čo všetko tvorí celkový dopyt v ekonomike? Rozbal každú zložku a zisti, čo sa v nej skrýva.</p>
+  </div>
+
+  <!-- Formula bar -->
+  <div class="ae-formula-bar">
+    <div class="ae-formula-eq">
+      <span class="ae-eq-lhs">AE</span>
+      <span class="ae-eq-eq">=</span>
+
+      <div class="ae-block" data-id="c" onclick="activateSection('c')">
+        <div class="ae-block-letter">C</div>
+        <div class="ae-block-sub">Spotreba</div>
+        <div class="ae-block-expr">Ca + mpc·Y − mpc·Ta …</div>
+      </div>
+
+      <span class="ae-op">+</span>
+
+      <div class="ae-block" data-id="i" onclick="activateSection('i')">
+        <div class="ae-block-letter">I</div>
+        <div class="ae-block-sub">Investície</div>
+        <div class="ae-block-expr">I − b·i</div>
+      </div>
+
+      <span class="ae-op">+</span>
+
+      <div class="ae-block" data-id="g" onclick="activateSection('g')">
+        <div class="ae-block-letter">G</div>
+        <div class="ae-block-sub">Vláda</div>
+        <div class="ae-block-expr">exogénne</div>
+      </div>
+
+      <span class="ae-op">+</span>
+
+      <div class="ae-block" data-id="nx" onclick="activateSection('nx')">
+        <div class="ae-block-letter">NX</div>
+        <div class="ae-block-sub">Čistý export</div>
+        <div class="ae-block-expr">EX − IMa − m·Y + v·R</div>
+      </div>
+    </div>
+    <div class="ae-hint">↑ Klikni na zložku pre detailné zobrazenie</div>
+  </div>
+
+  <!-- Panels -->
+  <div class="ae-panels">
+
+    <!-- Default -->
+    <div id="panel-default" class="ae-panel active">
+      <div class="ae-panel-default">
+        <div class="icon-ring"><i class="fa-solid fa-shapes"></i></div>
+        <h2>Vzorec vyzerá zložito, ale nie je!</h2>
+        <p>Je to len <strong>Spotreba (C) + Investície (I) + Vláda (G) + Čistý export (NX)</strong>.<br><br>
+        Klikni na zložku vzorca hore a uvidíš, čo sa v nej presne skrýva.</p>
+      </div>
+    </div>
+
+    <!-- C — Spotreba -->
+    <div id="panel-c" class="ae-panel" style="--clr: var(--c-c)">
+      <div class="ae-panel-hdr">
+        <div class="ae-panel-icon" style="background: color-mix(in srgb, var(--c-c) 15%, var(--card)); color: var(--c-c);">
+          <i class="fa-solid fa-cart-shopping"></i>
+        </div>
+        <div class="ae-panel-meta">
+          <div class="ae-panel-kicker" style="color:var(--c-c)">Zložka C</div>
+          <div class="ae-panel-title">Spotreba domácností</div>
+          <div class="ae-panel-desc">Závisí od disponibilného príjmu — toho, čo nám zostane po daniach.</div>
+        </div>
+      </div>
+      <div class="ae-subfmla" style="border-left-color: var(--c-c); color: #ffa0a0;">
+        C = Ca + mpc·Y − mpc·Ta − mpc·t·Y + mpc·TR
+      </div>
+      <div class="ae-vars">
+        <div class="ae-var">
+          <div class="ae-var-top"><span class="ae-var-sym" style="color:var(--c-c)">Ca</span><i class="fa-solid fa-bread-slice ae-var-ico"></i></div>
+          <h4>Autonómna spotreba</h4>
+          <p>Nutné výdavky na prežitie (jedlo, nájom). Miniemu ich aj keď Y = 0.</p>
+        </div>
+        <div class="ae-var">
+          <div class="ae-var-top"><span class="ae-var-sym" style="color:var(--c-c)">mpc</span><i class="fa-solid fa-percentage ae-var-ico"></i></div>
+          <h4>Medzný sklon k spotrebe</h4>
+          <p>Z každého dodatočného € koľko pôjde na spotrebu (napr. 0,8 = 80 %).</p>
+        </div>
+        <div class="ae-var">
+          <div class="ae-var-top"><span class="ae-var-sym" style="color:var(--c-c)">Y</span><i class="fa-solid fa-coins ae-var-ico"></i></div>
+          <h4>Dôchodok (Príjem)</h4>
+          <p>Celkový príjem ekonomiky. Čím vyšší, tým vyššia spotreba.</p>
+        </div>
+        <div class="ae-var minus">
+          <div class="ae-var-top"><span class="ae-var-sym">− Ta</span><i class="fa-solid fa-file-invoice-dollar ae-var-ico"></i></div>
+          <h4>Autonómne dane</h4>
+          <p>Fixná daň — štát nám zoberie tieto peniaze, preto znižuje spotrebu (mínus).</p>
+        </div>
+        <div class="ae-var minus">
+          <div class="ae-var-top"><span class="ae-var-sym">− t·Y</span><i class="fa-solid fa-scissors ae-var-ico"></i></div>
+          <h4>Sadzba dane z príjmu</h4>
+          <p>Proporcionálna daň — štát odstrihne % z príjmu. Tiež znižuje spotrebu.</p>
+        </div>
+        <div class="ae-var plus">
+          <div class="ae-var-top"><span class="ae-var-sym">+ TR</span><i class="fa-solid fa-hand-holding-dollar ae-var-ico"></i></div>
+          <h4>Transfery</h4>
+          <p>Peniaze od štátu (dôchodky, dávky). Zvyšujú disponibilný príjem → spotrebu ↑.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- I — Investície -->
+    <div id="panel-i" class="ae-panel" style="--clr: var(--c-i)">
+      <div class="ae-panel-hdr">
+        <div class="ae-panel-icon" style="background: color-mix(in srgb, var(--c-i) 15%, var(--card)); color: var(--c-i);">
+          <i class="fa-solid fa-industry"></i>
+        </div>
+        <div class="ae-panel-meta">
+          <div class="ae-panel-kicker" style="color:var(--c-i)">Zložka I</div>
+          <div class="ae-panel-title">Súkromné investície</div>
+          <div class="ae-panel-desc">Nákupy firiem (stroje, budovy). Veľmi závisia od ceny úverov.</div>
+        </div>
+      </div>
+      <div class="ae-subfmla" style="border-left-color: var(--c-i);">
+        I = Ia − b·i
+      </div>
+      <div class="ae-vars">
+        <div class="ae-var">
+          <div class="ae-var-top"><span class="ae-var-sym" style="color:var(--c-i)">Ia</span><i class="fa-solid fa-city ae-var-ico"></i></div>
+          <h4>Autonómne investície</h4>
+          <p>Základné plánované investície bez ohľadu na výšku úroku (plánované na základe očakávaní zisku).</p>
+        </div>
+        <div class="ae-var">
+          <div class="ae-var-top"><span class="ae-var-sym" style="color:var(--c-i)">b</span><i class="fa-solid fa-scale-balanced ae-var-ico"></i></div>
+          <h4>Citlivosť na úrok</h4>
+          <p>Ukazuje, o koľko firmy znížia investície, ak úrok stúpne o 1 %. Vyššie b = citlivejšie firmy.</p>
+        </div>
+        <div class="ae-var minus">
+          <div class="ae-var-top"><span class="ae-var-sym">− i</span><i class="fa-solid fa-arrow-trend-up ae-var-ico"></i></div>
+          <h4>Úroková miera</h4>
+          <p>Cena požičaných peňazí. Pretože je pred ňou <strong>mínus</strong>: ↑ Úrok → ↓ Investície.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- G — Vláda -->
+    <div id="panel-g" class="ae-panel" style="--clr: var(--c-g)">
+      <div class="ae-panel-hdr">
+        <div class="ae-panel-icon" style="background: color-mix(in srgb, var(--c-g) 15%, var(--card)); color: var(--c-g);">
+          <i class="fa-solid fa-building-columns"></i>
+        </div>
+        <div class="ae-panel-meta">
+          <div class="ae-panel-kicker" style="color:var(--c-g)">Zložka G</div>
+          <div class="ae-panel-title">Vládne výdavky</div>
+          <div class="ae-panel-desc">Nákupy tovarov a služieb štátom (diaľnice, platy učiteľov, armáda).</div>
+        </div>
+      </div>
+      <div class="ae-subfmla" style="border-left-color: var(--c-g); color: #ffd080;">
+        G &nbsp;(žiadne ďalšie premenné — exogénne)
+      </div>
+      <div class="ae-g-card">
+        <div class="ae-g-lock"><i class="fa-solid fa-lock"></i></div>
+        <div class="ae-g-body">
+          <h3>Čistá autonómia — prečo G nemá ďalšie premenné?</h3>
+          <p>Vláda sa rozhoduje na základe <strong>politiky a štátneho rozpočtu</strong>, nie na základe aktuálnej úrokovej miery alebo HDP. Preto v tomto modeli považujeme G za <strong>exogénnu veličinu</strong> — hodnotu, ktorú dostaneme „zvonka" ako daný fakt.</p>
+          <p>Chceš pochopiť, <em>čo sa stane, ak vláda zmení G</em>? To je presne to, čo vysvetľujú posuny IS krivky v druhej sekcii.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- NX — Čistý export -->
+    <div id="panel-nx" class="ae-panel" style="--clr: var(--c-nx)">
+      <div class="ae-panel-hdr">
+        <div class="ae-panel-icon" style="background: color-mix(in srgb, var(--c-nx) 15%, var(--card)); color: var(--c-nx);">
+          <i class="fa-solid fa-plane-departure"></i>
+        </div>
+        <div class="ae-panel-meta">
+          <div class="ae-panel-kicker" style="color:var(--c-nx)">Zložka NX</div>
+          <div class="ae-panel-title">Čistý export</div>
+          <div class="ae-panel-desc">Zahraničný obchod: Vývoz (Export) mínus Dovoz (Import).</div>
+        </div>
+      </div>
+      <div class="ae-subfmla" style="border-left-color: var(--c-nx); color: #c4b5fd;">
+        NX = EX − IMa − m·Y + v·R
+      </div>
+      <div class="ae-vars">
+        <div class="ae-var plus">
+          <div class="ae-var-top"><span class="ae-var-sym">EX</span><i class="fa-solid fa-box-open ae-var-ico"></i></div>
+          <h4>Export (Vývoz)</h4>
+          <p>To, čo predáme do zahraničia. Autonómny — závisí od záujmu zahraničia, nie od nás.</p>
+        </div>
+        <div class="ae-var minus">
+          <div class="ae-var-top"><span class="ae-var-sym">− IMa</span><i class="fa-solid fa-truck-fast ae-var-ico"></i></div>
+          <h4>Autonómny import</h4>
+          <p>Nutný dovoz (napr. ropa, plyn). Dovážame ho vždy → mínus (znižuje NX).</p>
+        </div>
+        <div class="ae-var minus">
+          <div class="ae-var-top"><span class="ae-var-sym">− m·Y</span><i class="fa-solid fa-wallet ae-var-ico"></i></div>
+          <h4>Import z príjmu</h4>
+          <p>Čím sme bohatší, tým viac kupujeme zahraničné tovary → znižuje NX.</p>
+        </div>
+        <div class="ae-var plus">
+          <div class="ae-var-top"><span class="ae-var-sym">+ v·R</span><i class="fa-solid fa-money-bill-transfer ae-var-ico"></i></div>
+          <h4>Kurzový vplyv</h4>
+          <p><strong>R</strong> = menový kurz, <strong>v</strong> = citlivosť. Výhodný kurz → lacný vývoz → EX ↑.</p>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /ae-panels -->
+</div><!-- /page-ae -->
+
+
+<!-- ════════════════════════════════════════════════
+     PAGE 2 — IS-LM GRAPHS
+════════════════════════════════════════════════ -->
+<div id="page-islm" class="page-view">
+
+<nav class="islm-subnav">
+  <a href="#kriz">01 Keynesiánský kríž</a>
+  <a href="#is">02 Krivka IS</a>
+  <a href="#lm">03 Krivka LM</a>
+  <a href="#islm-sec">04 IS-LM rovnováha</a>
+  <a href="#bp">05 IS-LM-BP</a>
+  <a href="#shifts">06 Posuny IS &amp; LM</a>
+</nav>
+
+<div class="islm-main">
+
+<!-- ── 01 Keynesiánský kríž ─────────────────────── -->
+<section id="kriz" class="islm-section">
+  <div class="sec-num">01 — Keynesiánský model</div>
+  <h2>Model výdaje-důchod (Keynesiánský kríž)</h2>
+  <p class="sec-sub">Ako domácnosti, firmy a stát určujú rovnovážny výstup</p>
+  <div class="cols-2">
+    <div>
+      <div class="gc">
+        <div class="gt">Graf: Keynesiánský kríž</div>
+        <svg viewBox="0 0 520 440" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <marker id="ah" markerWidth="9" markerHeight="7" refX="9" refY="3.5" orient="auto"><polygon points="0 0,9 3.5,0 7" fill="#3d4f61"/></marker>
+          <marker id="aheq" markerWidth="7" markerHeight="5" refX="7" refY="2.5" orient="auto"><polygon points="0 0,7 2.5,0 5" fill="#e3b341"/></marker>
+        </defs>
+        <line x1="70" y1="380" x2="500" y2="380" stroke="#3d4f61" stroke-width="1.5" marker-end="url(#ah)"/>
+        <line x1="70" y1="380" x2="70" y2="20"  stroke="#3d4f61" stroke-width="1.5" marker-end="url(#ah)"/>
+        <text x="506" y="385" fill="#7a8fa6" font-size="14" font-style="italic" font-family="serif">Y</text>
+        <text x="54"  y="16"  fill="#7a8fa6" font-size="14" font-family="serif">AD</text>
+        <line x1="70" y1="380" x2="440" y2="10" stroke="#3d4f61" stroke-width="1.5" stroke-dasharray="8,5"/>
+        <text x="442" y="10" fill="#7a8fa6" font-size="11" font-family="serif">45° (Y=AD)</text>
+        <line x1="70" y1="300" x2="490" y2="300" stroke="#f59e0b" stroke-width="1.5" stroke-dasharray="5,4" opacity=".7"/>
+        <text x="12" y="304" fill="#f59e0b" font-size="12" font-style="italic" font-family="serif">Ca</text>
+        <line x1="70" y1="250" x2="490" y2="250" stroke="#c678dd" stroke-width="1.5" opacity=".85"/>
+        <text x="4" y="254" fill="#c678dd" font-size="11" font-family="serif">A=Ca+Ja</text>
+        <line x1="70" y1="300" x2="420" y2="90" stroke="#f59e0b" stroke-width="2"/>
+        <text x="422" y="88" fill="#f59e0b" font-size="11" font-family="serif">C = Ca + c·YD</text>
+        <line x1="70" y1="250" x2="430" y2="34" stroke="#58a6ff" stroke-width="2.5"/>
+        <text x="432" y="32" fill="#58a6ff" font-size="11" font-family="serif">AE = Ca+Ja+c·YD</text>
+        <line x1="70" y1="220" x2="395" y2="25" stroke="#58a6ff" stroke-width="1.5" stroke-dasharray="7,5" opacity=".55"/>
+        <text x="396" y="23" fill="#58a6ff" font-size="10" font-family="serif" opacity=".7">AE'</text>
+        <circle cx="395" cy="55" r="5" fill="#e3b341"/>
+        <text x="370" y="48" fill="#e3b341" font-size="12" font-style="italic" font-family="serif">E₀</text>
+        <line x1="395" y1="55" x2="395" y2="380" stroke="#e3b341" stroke-width="1" stroke-dasharray="4,3" opacity=".6"/>
+        <text x="384" y="395" fill="#e3b341" font-size="11" font-style="italic" font-family="serif">Y₀</text>
+        <circle cx="420" cy="30" r="5" fill="#e3b341" opacity=".65"/>
+        <text x="425" y="28" fill="#e3b341" font-size="12" font-style="italic" font-family="serif" opacity=".7">E₂</text>
+        <line x1="420" y1="30" x2="420" y2="380" stroke="#e3b341" stroke-width="1" stroke-dasharray="4,3" opacity=".4"/>
+        <text x="410" y="395" fill="#e3b341" font-size="11" font-style="italic" font-family="serif" opacity=".6">Y₂</text>
+        <circle cx="270" cy="180" r="4" fill="#e3b341" opacity=".65"/>
+        <text x="246" y="175" fill="#e3b341" font-size="12" font-style="italic" font-family="serif" opacity=".7">E₁</text>
+        <line x1="270" y1="180" x2="270" y2="380" stroke="#e3b341" stroke-width="1" stroke-dasharray="4,3" opacity=".4"/>
+        <text x="260" y="395" fill="#e3b341" font-size="11" font-style="italic" font-family="serif" opacity=".6">Y₁</text>
+        <line x1="278" y1="177" x2="320" y2="130" stroke="#e3b341" stroke-width="1.2" stroke-dasharray="3,2" opacity=".5" marker-end="url(#aheq)"/>
+        <line x1="63" y1="250" x2="63" y2="300" stroke="#c678dd" stroke-width="1.5"/>
+        <line x1="59" y1="250" x2="67" y2="250" stroke="#c678dd" stroke-width="1.5"/>
+        <line x1="59" y1="300" x2="67" y2="300" stroke="#c678dd" stroke-width="1.5"/>
+        <text x="10" y="280" fill="#c678dd" font-size="11" font-style="italic" font-family="serif">Ja</text>
+        </svg>
+        <div class="leg">
+          <div class="li"><div class="ll" style="background:#58a6ff"></div>AE (agregátne výdaje)</div>
+          <div class="li"><div class="ll" style="background:#f59e0b"></div>C (spotreba)</div>
+          <div class="li"><div class="ll" style="background:#c678dd"></div>A = Ca + Ja</div>
+          <div class="li"><div class="ll" style="border-top:2px dashed #3d4f61; background:transparent;"></div>45° línia</div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <h3>Čo graf ukazuje?</h3>
+      <p>Porovnáva plánované výdavky (AE) s reálnym výstupom (Y). Rovnováha nastáva, kde sa AE krivka pretína s 45° líniou.</p>
+      <div class="fmla">AE = Ca + Ja + c · YD</div>
+
+      <div class="steps">
+        <div class="step">
+          <div class="step-num">45°</div>
+          <div class="step-body"><strong>Každý bod na 45° línii splňuje Y = AD.</strong> Ide o všetky možné body rovnováhy — ekonomika sa vždy pohybuje smerom k tejto línii.</div>
+        </div>
+        <div class="step">
+          <div class="step-num">↑ AE</div>
+          <div class="step-body"><strong>Nad líniou (AE &gt; Y):</strong> firmy nestíhajú dopyt, zásoby klesajú → produkcia rastie smerom k E₀.</div>
+        </div>
+        <div class="step">
+          <div class="step-num">↓ AE</div>
+          <div class="step-body"><strong>Pod líniou (AE &lt; Y):</strong> výroba prevyšuje predaj → zásoby rastú → Y klesá.</div>
+        </div>
+      </div>
+
+      <h3>Multiplikátor</h3>
+      <p>Každé jedno euro navyše v autonómnych výdajoch zvýši Y o viac než 1 €.</p>
+      <div class="fmla">k = 1 / (1 − c)</div>
+      <div class="kp"><strong>Príklad:</strong> Pri c = 0,6 → k = 2,5. Každých +€1 v autonómnych výdajoch → +€2,50 v Y.</div>
+
+      <h3>Čo posúva AE nahor?</h3>
+      <p>↑ G, ↓ T, ↑ Ca, ↑ Ja — všetko posunie celú AE líniu nahor → nový rovnovážny výstup Y₂.</p>
+    </div>
+  </div>
+</section>
+
+
+<!-- ── 02 IS ─────────────────────────────────────── -->
+<section id="is" class="islm-section">
+  <div class="sec-num">02 — Trh statkov</div>
+  <h2>Odvozenie krivky IS</h2>
+  <p class="sec-sub">Kombinácie (Y, i) pri ktorých je trh statkov v rovnováhe — S = I</p>
+
+  <div class="cols-3" style="margin-bottom:28px;">
+    <div>
+      <div class="gc">
+        <div class="gt">(a) Krivka IS</div>
+        <svg viewBox="0 0 280 280" xmlns="http://www.w3.org/2000/svg">
+        <defs><marker id="a1" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#3d4f61"/></marker></defs>
+        <line x1="40" y1="240" x2="260" y2="240" stroke="#3d4f61" stroke-width="1.5" marker-end="url(#a1)"/>
+        <line x1="40" y1="240" x2="40" y2="20"  stroke="#3d4f61" stroke-width="1.5" marker-end="url(#a1)"/>
+        <text x="262" y="244" fill="#7a8fa6" font-size="12" font-style="italic" font-family="serif">Y</text>
+        <text x="28"  y="16"  fill="#7a8fa6" font-size="12" font-style="italic" font-family="serif">i</text>
+        <line x1="55" y1="52" x2="245" y2="225" stroke="#58a6ff" stroke-width="2.5"/>
+        <text x="247" y="228" fill="#58a6ff" font-size="14" font-family="serif" font-weight="bold">IS</text>
+        <circle cx="100" cy="97" r="4" fill="#e3b341"/>
+        <line x1="40" y1="97" x2="100" y2="97" stroke="#e3b341" stroke-width="1" stroke-dasharray="3,3"/>
+        <line x1="100" y1="97" x2="100" y2="240" stroke="#e3b341" stroke-width="1" stroke-dasharray="3,3"/>
+        <text x="17" y="101" fill="#e3b341" font-size="11" font-style="italic" font-family="serif">i₀</text>
+        <text x="93"  y="253" fill="#e3b341" font-size="11" font-style="italic" font-family="serif">Y₀</text>
+        <text x="105" y="93"  fill="#e3b341" font-size="11" font-style="italic" font-family="serif">E₀</text>
+        <circle cx="178" cy="170" r="4" fill="#e3b341"/>
+        <line x1="40"  y1="170" x2="178" y2="170" stroke="#e3b341" stroke-width="1" stroke-dasharray="3,3"/>
+        <line x1="178" y1="170" x2="178" y2="240" stroke="#e3b341" stroke-width="1" stroke-dasharray="3,3"/>
+        <text x="17"  y="174" fill="#e3b341" font-size="11" font-style="italic" font-family="serif">i₁</text>
+        <text x="170" y="253" fill="#e3b341" font-size="11" font-style="italic" font-family="serif">Y₁</text>
+        <text x="183" y="167" fill="#e3b341" font-size="11" font-style="italic" font-family="serif">E₁</text>
+        <text x="52" y="110" fill="#7a8fa6" font-size="20">↓</text>
+        <text x="130" y="238" fill="#7a8fa6" font-size="20">→</text>
+        </svg>
+      </div>
+    </div>
+    <div>
+      <div class="gc">
+        <div class="gt">(b) Investičná funkcia I(i)</div>
+        <svg viewBox="0 0 280 280" xmlns="http://www.w3.org/2000/svg">
+        <defs><marker id="a2" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#3d4f61"/></marker></defs>
+        <line x1="40" y1="240" x2="260" y2="240" stroke="#3d4f61" stroke-width="1.5" marker-end="url(#a2)"/>
+        <line x1="40" y1="240" x2="40" y2="20"  stroke="#3d4f61" stroke-width="1.5" marker-end="url(#a2)"/>
+        <text x="262" y="244" fill="#7a8fa6" font-size="12" font-style="italic" font-family="serif">I</text>
+        <text x="28"  y="16"  fill="#7a8fa6" font-size="12" font-style="italic" font-family="serif">i</text>
+        <line x1="60" y1="52" x2="240" y2="218" stroke="#3fb950" stroke-width="2.5"/>
+        <text x="242" y="220" fill="#3fb950" font-size="13" font-family="serif" font-weight="bold">I</text>
+        <circle cx="115" cy="97" r="3" fill="#e3b341"/>
+        <line x1="40"  y1="97"  x2="115" y2="97"  stroke="#e3b341" stroke-width="1" stroke-dasharray="3,3"/>
+        <line x1="115" y1="97"  x2="115" y2="240" stroke="#e3b341" stroke-width="1" stroke-dasharray="3,3"/>
+        <text x="17"  y="101"  fill="#e3b341" font-size="11" font-style="italic" font-family="serif">i₀</text>
+        <text x="108" y="253"  fill="#e3b341" font-size="11" font-style="italic" font-family="serif">I₀</text>
+        <circle cx="180" cy="170" r="3" fill="#e3b341"/>
+        <line x1="40"  y1="170" x2="180" y2="170" stroke="#e3b341" stroke-width="1" stroke-dasharray="3,3"/>
+        <line x1="180" y1="170" x2="180" y2="240" stroke="#e3b341" stroke-width="1" stroke-dasharray="3,3"/>
+        <text x="17"  y="174" fill="#e3b341" font-size="11" font-style="italic" font-family="serif">i₁</text>
+        <text x="173" y="253" fill="#e3b341" font-size="11" font-style="italic" font-family="serif">I₁</text>
+        <text x="48"  y="128" fill="#7a8fa6" font-size="18">↓</text>
+        <text x="140" y="232" fill="#7a8fa6" font-size="18">→</text>
+        </svg>
+      </div>
+    </div>
+    <div>
+      <div class="gc">
+        <div class="gt">(c) Keynesiánský kríž</div>
+        <svg viewBox="0 0 280 280" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <marker id="a3" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#3d4f61"/></marker>
+          <marker id="a3eq" markerWidth="6" markerHeight="5" refX="6" refY="2.5" orient="auto"><polygon points="0 0,6 2.5,0 5" fill="#e3b341"/></marker>
+        </defs>
+        <line x1="40" y1="240" x2="260" y2="240" stroke="#3d4f61" stroke-width="1.5" marker-end="url(#a3)"/>
+        <line x1="40" y1="240" x2="40" y2="20"  stroke="#3d4f61" stroke-width="1.5" marker-end="url(#a3)"/>
+        <text x="262" y="244" fill="#7a8fa6" font-size="12" font-style="italic" font-family="serif">Y</text>
+        <text x="27"  y="16"  fill="#7a8fa6" font-size="11" font-family="serif">AD</text>
+        <line x1="40" y1="240" x2="242" y2="38" stroke="#3d4f61" stroke-width="1.5" stroke-dasharray="6,4"/>
+        <text x="244" y="36" fill="#3d4f61" font-size="10" font-family="serif">AD=Y</text>
+        <line x1="40" y1="195" x2="242" y2="94" stroke="#58a6ff" stroke-width="2" opacity=".5"/>
+        <text x="244" y="92" fill="#58a6ff" font-size="11" font-family="serif" opacity=".6">AD₀</text>
+        <text x="17"  y="199" fill="#c678dd" font-size="10" font-style="italic" font-family="serif">A₀</text>
+        <line x1="40" y1="163" x2="242" y2="62" stroke="#58a6ff" stroke-width="2"/>
+        <text x="244" y="60" fill="#58a6ff" font-size="11" font-family="serif">AD₁</text>
+        <text x="17"  y="167" fill="#c678dd" font-size="10" font-style="italic" font-family="serif">A₁</text>
+        <line x1="80" y1="185" x2="80" y2="157" stroke="#e3b341" stroke-width="1.5" marker-end="url(#a3eq)" opacity=".7"/>
+        <circle cx="130" cy="150" r="3" fill="#e3b341" opacity=".65"/>
+        <line x1="130" y1="150" x2="130" y2="240" stroke="#e3b341" stroke-width="1" stroke-dasharray="3,3" opacity=".5"/>
+        <text x="120" y="252" fill="#e3b341" font-size="10" font-style="italic" font-family="serif" opacity=".65">Y₀</text>
+        <circle cx="194" cy="86" r="3" fill="#e3b341"/>
+        <line x1="194" y1="86" x2="194" y2="240" stroke="#e3b341" stroke-width="1" stroke-dasharray="3,3" opacity=".7"/>
+        <text x="185" y="252" fill="#e3b341" font-size="10" font-style="italic" font-family="serif">Y₁</text>
+        </svg>
+      </div>
+    </div>
+  </div>
+
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">01</div>
+      <div class="step-body"><strong>Panel (b) — Klesne i₀ → i₁.</strong> Investície sú lacnejšie (nižší úrok) → firmy viac investujú → <em>I₀ → I₁</em>.</div>
+    </div>
+    <div class="step">
+      <div class="step-num">02</div>
+      <div class="step-body"><strong>Panel (c) — Vyššie I zdvihnú autonómnu zložku A.</strong> Multiplikátor znásobí efekt → rovnováha sa presunie z <em>Y₀ na Y₁</em>.</div>
+    </div>
+    <div class="step">
+      <div class="step-num">03</div>
+      <div class="step-body"><strong>Panel (a) — Každú dvojicu (i, Y) zaznačíme</strong> → vznikne IS krivka so záporným sklonom: <em>nižšie i = vyššie Y</em>.</div>
+    </div>
+  </div>
+  <div class="kp"><strong>Sklon IS:</strong> plochejšia IS = investície sú veľmi citlivé na i, alebo veľký multiplikátor. Strmšia IS = málo citlivé investície alebo malý multiplikátor.</div>
+</section>
+
+
+<!-- ── 03 LM ─────────────────────────────────────── -->
+<section id="lm" class="islm-section">
+  <div class="sec-num">03 — Trh peňazí</div>
+  <h2>Krivka LM a rovnováha na trhu peňazí</h2>
+  <p class="sec-sub">Kombinácie (Y, i) pri ktorých M/P = L(Y, i)</p>
+  <div class="cols-2">
+    <div>
+      <div class="gc">
+        <div class="gt">Graf: Odvodenie krivky LM</div>
+        <svg viewBox="0 0 520 320" xmlns="http://www.w3.org/2000/svg">
+        <defs><marker id="a4" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#3d4f61"/></marker></defs>
+        <line x1="62" y1="280" x2="498" y2="280" stroke="#3d4f61" stroke-width="1.5" marker-end="url(#a4)"/>
+        <line x1="62" y1="280" x2="62" y2="20"  stroke="#3d4f61" stroke-width="1.5" marker-end="url(#a4)"/>
+        <text x="500" y="285" fill="#7a8fa6" font-size="12" font-style="italic" font-family="serif">Y (mld. Kč)</text>
+        <text x="40"  y="16"  fill="#7a8fa6" font-size="12" font-style="italic" font-family="serif">i (%)</text>
+        <line x1="160" y1="25" x2="320" y2="275" stroke="#f78166" stroke-width="2.5"/>
+        <text x="325" y="272" fill="#f78166" font-size="14" font-family="serif" font-weight="bold">LM</text>
+        <circle cx="252" cy="169" r="5" fill="#e3b341"/>
+        <line x1="62"  y1="169" x2="252" y2="169" stroke="#e3b341" stroke-width="1" stroke-dasharray="4,3"/>
+        <line x1="252" y1="169" x2="252" y2="280" stroke="#e3b341" stroke-width="1" stroke-dasharray="4,3"/>
+        <text x="30"  y="173" fill="#e3b341" font-size="11" font-family="serif">3 %</text>
+        <text x="235" y="294" fill="#e3b341" font-size="11" font-family="serif">2 000</text>
+        <text x="255" y="163" fill="#e3b341" font-size="11" font-style="italic" font-family="serif">E₁</text>
+        <circle cx="300" cy="94" r="5" fill="#e3b341"/>
+        <line x1="62"  y1="94"  x2="300" y2="94"  stroke="#e3b341" stroke-width="1" stroke-dasharray="4,3"/>
+        <line x1="300" y1="94"  x2="300" y2="280" stroke="#e3b341" stroke-width="1" stroke-dasharray="4,3"/>
+        <text x="30"  y="98"   fill="#e3b341" font-size="11" font-family="serif">5 %</text>
+        <text x="283" y="294"  fill="#e3b341" font-size="11" font-family="serif">2 500</text>
+        <text x="305" y="88"   fill="#e3b341" font-size="11" font-style="italic" font-family="serif">E₂</text>
+        </svg>
+      </div>
+    </div>
+    <div>
+      <h3>Čo je LM krivka?</h3>
+      <p>LM krivka zachytáva všetky kombinácie (Y, i), pri ktorých je trh peňazí v rovnováhe — ponuka reálnych zostatkov sa rovná dopytu po peniazoch.</p>
+      <div class="fmla lm">M/P = L(Y, i) = k·Y − h·i</div>
+
+      <div class="steps">
+        <div class="step lm">
+          <div class="step-num">Y↑</div>
+          <div class="step-body"><strong>Rastie Y (príjem).</strong> Dopyt po peniazoch na transakcie rastie → pri konštantnej M/P musí i vzrásť, aby trh vyčistil.</div>
+        </div>
+        <div class="step lm">
+          <div class="step-num">∴</div>
+          <div class="step-body"><strong>LM má kladný sklon:</strong> vyššie Y si vyžaduje vyššie i na udržanie rovnováhy na trhu peňazí.</div>
+        </div>
+      </div>
+
+      <h3>Tvary LM — špeciálne prípady</h3>
+      <div class="steps">
+        <div class="step lm">
+          <div class="step-num">h → ∞</div>
+          <div class="step-body"><strong>Horizontálna LM (likviditná pasca):</strong> i je fixné, monetárna politika nemá efekt. Typické v krízach (napr. 2008).</div>
+        </div>
+        <div class="step lm">
+          <div class="step-num">h → 0</div>
+          <div class="step-body"><strong>Vertikálna LM (klasický prípad):</strong> dopyt po peniazoch nezávisí od i. Monetárna politika má plný efekt na Y.</div>
+        </div>
+      </div>
+      <div class="kp"><strong>Posun LM:</strong> ↑ M/P (CB tlačí viac peňazí) → LM sa posúva doprava → pri rovnakom Y klesá i.</div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ── 04 IS-LM rovnováha ─────────────────────────── -->
+<section id="islm-sec" class="islm-section">
+  <div class="sec-num">04 — Celková rovnováha</div>
+  <h2>IS-LM rovnováha</h2>
+  <p class="sec-sub">Simultánna rovnováha na trhu statkov aj na trhu peňazí</p>
+  <div class="cols-2">
+    <div>
+      <div class="gc">
+        <div class="gt">Graf: IS-LM rovnováha</div>
+        <svg viewBox="0 0 480 360" xmlns="http://www.w3.org/2000/svg">
+        <defs><marker id="a5" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#3d4f61"/></marker></defs>
+        <line x1="55" y1="320" x2="450" y2="320" stroke="#3d4f61" stroke-width="1.5" marker-end="url(#a5)"/>
+        <line x1="55" y1="320" x2="55" y2="20"  stroke="#3d4f61" stroke-width="1.5" marker-end="url(#a5)"/>
+        <text x="452" y="325" fill="#7a8fa6" font-size="13" font-style="italic" font-family="serif">Y</text>
+        <text x="38"  y="16"  fill="#7a8fa6" font-size="13" font-style="italic" font-family="serif">i</text>
+        <line x1="80"  y1="55"  x2="420" y2="305" stroke="#58a6ff" stroke-width="2.5"/>
+        <text x="424" y="308" fill="#58a6ff" font-size="14" font-family="serif" font-weight="bold">IS</text>
+        <line x1="75"  y1="305" x2="420" y2="55"  stroke="#f78166" stroke-width="2.5"/>
+        <text x="424" y="53" fill="#f78166" font-size="14" font-family="serif" font-weight="bold">LM</text>
+        <circle cx="248" cy="180" r="7" fill="#e3b341"/>
+        <text x="256" y="174" fill="#e3b341" font-size="13" font-style="italic" font-family="serif" font-weight="bold">E*</text>
+        <line x1="55"  y1="180" x2="248" y2="180" stroke="#e3b341" stroke-width="1.5" stroke-dasharray="4,3"/>
+        <line x1="248" y1="180" x2="248" y2="320" stroke="#e3b341" stroke-width="1.5" stroke-dasharray="4,3"/>
+        <text x="18"  y="184" fill="#e3b341" font-size="12" font-style="italic" font-family="serif">i*</text>
+        <text x="236" y="334" fill="#e3b341" font-size="12" font-style="italic" font-family="serif">Y*</text>
+        <text x="310" y="100" fill="#58a6ff" font-size="10" font-family="serif" opacity=".6">S &gt; I</text>
+        <text x="130" y="270" fill="#58a6ff" font-size="10" font-family="serif" opacity=".6">I &gt; S</text>
+        <text x="330" y="240" fill="#f78166" font-size="10" font-family="serif" opacity=".6">M/P &gt; L</text>
+        <text x="80"  y="130" fill="#f78166" font-size="10" font-family="serif" opacity=".6">L &gt; M/P</text>
+        </svg>
+      </div>
+    </div>
+    <div>
+      <h3>Čo je rovnovážny bod E*?</h3>
+      <p>Priesečník IS a LM krivky — jediný bod, kde je súčasne v rovnováhe trh statkov (S = I) aj trh peňazí (M/P = L).</p>
+
+      <div class="steps">
+        <div class="step">
+          <div class="step-num">IS</div>
+          <div class="step-body"><strong>Nad IS (S &gt; I):</strong> prebytok úspor → tlak na pokles i alebo Y. <strong>Pod IS (I &gt; S):</strong> tlak na rast.</div>
+        </div>
+        <div class="step lm">
+          <div class="step-num">LM</div>
+          <div class="step-body"><strong>Nad LM (L &gt; M/P):</strong> dopyt po peniazoch prevyšuje ponuku → i rastie. <strong>Pod LM (M/P &gt; L):</strong> i klesá.</div>
+        </div>
+        <div class="step">
+          <div class="step-num">E*</div>
+          <div class="step-body">Iba v priesečníku sú <strong>oba trhy v rovnováhe súčasne</strong>. Ekonomika sa k tomuto bodu prirodzene konverguje.</div>
+        </div>
+      </div>
+      <div class="kp"><strong>Kľúčová lekcia:</strong> IS-LM nám hovorí, že úroková miera a výstup sú určované simultánne — nie nezávisle na sebe.</div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ── 05 BP ─────────────────────────────────────── -->
+<section id="bp" class="islm-section">
+  <div class="sec-num">05 — Otvorená ekonomika</div>
+  <h2>IS-LM-BP model</h2>
+  <p class="sec-sub">Platobná bilancia a Mundell-Flemingov model</p>
+  <div class="cols-2">
+    <div>
+      <div class="gc">
+        <div class="gt">Graf: IS-LM-BP rovnováha</div>
+        <svg viewBox="0 0 500 380" xmlns="http://www.w3.org/2000/svg">
+        <defs><marker id="a6" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#3d4f61"/></marker></defs>
+        <line x1="60" y1="340" x2="480" y2="340" stroke="#3d4f61" stroke-width="1.5" marker-end="url(#a6)"/>
+        <line x1="60" y1="340" x2="60" y2="20"  stroke="#3d4f61" stroke-width="1.5" marker-end="url(#a6)"/>
+        <text x="484" y="345" fill="#7a8fa6" font-size="13" font-style="italic" font-family="serif">Y</text>
+        <text x="44"  y="16"  fill="#7a8fa6" font-size="13" font-style="italic" font-family="serif">i</text>
+        <line x1="85"  y1="60"  x2="435" y2="320" stroke="#58a6ff" stroke-width="2.5"/>
+        <text x="439" y="323" fill="#58a6ff" font-size="14" font-family="serif" font-weight="bold">IS</text>
+        <line x1="80"  y1="320" x2="430" y2="60"  stroke="#f78166" stroke-width="2.5"/>
+        <text x="432" y="58" fill="#f78166" font-size="14" font-family="serif" font-weight="bold">LM</text>
+        <line x1="75"  y1="295" x2="430" y2="75"  stroke="#3fb950" stroke-width="2"/>
+        <text x="432" y="73" fill="#3fb950" font-size="13" font-family="serif" font-weight="bold">BP</text>
+        <circle cx="258" cy="190" r="6" fill="#e3b341"/>
+        <text x="264" y="185" fill="#e3b341" font-size="12" font-style="italic" font-family="serif" font-weight="bold">E*</text>
+        <line x1="60"  y1="190" x2="258" y2="190" stroke="#e3b341" stroke-width="1" stroke-dasharray="4,3" opacity=".6"/>
+        <line x1="258" y1="190" x2="258" y2="340" stroke="#e3b341" stroke-width="1" stroke-dasharray="4,3" opacity=".6"/>
+        <line x1="60" y1="200" x2="480" y2="200" stroke="#3fb950" stroke-width="2" stroke-dasharray="5,3" opacity=".5"/>
+        <text x="330" y="192" fill="#3fb950" font-size="10" font-family="serif" opacity=".6">BP (dokonalá mobilita)</text>
+        <text x="28"  y="204" fill="#3fb950" font-size="11" font-style="italic" font-family="serif" opacity=".5">i*</text>
+        <text x="230" y="155" fill="#7a8fa6" font-size="11" font-family="serif">↑ Prebytok BP</text>
+        <text x="150" y="295" fill="#7a8fa6" font-size="11" font-family="serif">↓ Deficit BP</text>
+        </svg>
+      </div>
+      <div class="gc" style="margin-top:14px">
+        <div class="gt">Poloha bodov voči BP krivke</div>
+        <svg viewBox="0 0 500 260" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <marker id="a7"  markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#3d4f61"/></marker>
+          <marker id="ab"  markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#58a6ff"/></marker>
+          <marker id="aor" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#f78166"/></marker>
+        </defs>
+        <line x1="60" y1="220" x2="480" y2="220" stroke="#3d4f61" stroke-width="1.5" marker-end="url(#a7)"/>
+        <line x1="60" y1="220" x2="60" y2="20"  stroke="#3d4f61" stroke-width="1.5" marker-end="url(#a7)"/>
+        <text x="484" y="225" fill="#7a8fa6" font-size="13" font-style="italic" font-family="serif">Y</text>
+        <text x="44"  y="16"  fill="#7a8fa6" font-size="13" font-style="italic" font-family="serif">i</text>
+        <line x1="80" y1="195" x2="440" y2="55" stroke="#3fb950" stroke-width="2"/>
+        <text x="444" y="53" fill="#3fb950" font-size="13" font-family="serif" font-weight="bold">BP</text>
+        <circle cx="160" cy="65"  r="5" fill="#58a6ff"/><text x="168" y="63"  fill="#58a6ff" font-size="12" font-family="serif" font-weight="bold">D</text>
+        <circle cx="250" cy="90"  r="5" fill="#58a6ff"/><text x="258" y="88"  fill="#58a6ff" font-size="12" font-family="serif" font-weight="bold">A</text>
+        <circle cx="250" cy="130" r="5" fill="#e3b341"/><text x="258" y="128" fill="#e3b341" font-size="12" font-family="serif" font-weight="bold">B</text>
+        <circle cx="140" cy="165" r="5" fill="#f78166"/><text x="148" y="163" fill="#f78166" font-size="12" font-family="serif" font-weight="bold">C</text>
+        <circle cx="370" cy="170" r="5" fill="#f78166"/><text x="378" y="168" fill="#f78166" font-size="12" font-family="serif" font-weight="bold">E</text>
+        <line x1="195" y1="35" x2="100" y2="35" stroke="#58a6ff" stroke-width="1.5" marker-end="url(#ab)"/>
+        <text x="96"  y="28" fill="#58a6ff" font-size="11" font-family="serif">zhodnocení</text>
+        <line x1="285" y1="35" x2="380" y2="35" stroke="#f78166" stroke-width="1.5" marker-end="url(#aor)"/>
+        <text x="285" y="28" fill="#f78166" font-size="11" font-family="serif">znehodnocení</text>
+        </svg>
+      </div>
+    </div>
+    <div>
+      <h3>BP krivka — platobná bilancia</h3>
+      <p>BP krivka zachytáva kombinácie (Y, i), pri ktorých je platobná bilancia vyrovnaná.</p>
+      <div class="fmla bp">BP = CA(Y) + KA(i − i*) = 0</div>
+
+      <h3>Prečo BP rastie?</h3>
+      <div class="steps">
+        <div class="step bp">
+          <div class="step-num">Y↑</div>
+          <div class="step-body"><strong>Rastie Y → rastie import</strong> → bežný účet CA klesá (deficit).</div>
+        </div>
+        <div class="step bp">
+          <div class="step-num">∴ i↑</div>
+          <div class="step-body">Aby zostala BP = 0, musí <strong>vzrásť i → kapitál prúdi dovnútra → KA vyrovná CA.</strong> Preto BP má kladný sklon.</div>
+        </div>
+      </div>
+
+      <h3>Body mimo BP krivky</h3>
+      <p><strong>Nad BP</strong> (body A, D): prebytok → kapitál prúdi dovnútra → <em>zhodnotenie kurzu</em>.</p>
+      <p><strong>Pod BP</strong> (body C, E): deficit → kapitál odteká → <em>znehodnotenie kurzu</em>.</p>
+      <p><strong>Na BP</strong> (bod B): rovnováha, bez pohybu kurzu.</p>
+
+      <h3>Typy kapitálovej mobility</h3>
+      <div class="steps">
+        <div class="step bp"><div class="step-num">|</div><div class="step-body"><strong>Vertikálna BP:</strong> dokonalá imobilita — iba bežný účet.</div></div>
+        <div class="step bp"><div class="step-num">↗</div><div class="step-body"><strong>Kladný sklon:</strong> obmedzená mobilita — typické pre rozvíjajúce sa ekonomiky.</div></div>
+        <div class="step bp"><div class="step-num">—</div><div class="step-body"><strong>Horizontálna BP = i*:</strong> dokonalá mobilita — malá otvorená ekonómia.</div></div>
+      </div>
+
+      <div class="kp"><strong>Mundell-Fleming trilemma:</strong> Krajina nemôže súčasne mať (1) fixný kurz, (2) voľný pohyb kapitálu, (3) nezávislú monetárnu politiku. Možné sú len 2 z 3.</div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ── 06 Shifts ──────────────────────────────────── -->
+<section id="shifts" class="islm-section">
+  <div class="sec-num">06 — Hospodárska politika</div>
+  <h2>Čo sa stane, keď sa IS alebo LM posunie?</h2>
+  <p class="sec-sub">Fiškálna politika (posúva IS) a monetárna politika (posúva LM)</p>
+
+  <div class="cols-4">
+    <!-- IS → -->
+    <div class="shift-card">
+      <div class="shift-card-hdr is-hdr">
+        IS → doprava — Expanzívna fiškálna politika
+        <span class="rbadge up" style="margin:0;font-size:10px;padding:2px 8px;">Y↑ i↑</span>
+      </div>
+      <div class="shift-card-svg">
+        <svg viewBox="0 0 480 360" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <marker id="s1"  markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#3d4f61"/></marker>
+          <marker id="s1b" markerWidth="7" markerHeight="5" refX="7" refY="2.5" orient="auto"><polygon points="0 0,7 2.5,0 5" fill="#58a6ff"/></marker>
+        </defs>
+        <line x1="55" y1="320" x2="460" y2="320" stroke="#3d4f61" stroke-width="1.5" marker-end="url(#s1)"/>
+        <line x1="55" y1="320" x2="55" y2="20"  stroke="#3d4f61" stroke-width="1.5" marker-end="url(#s1)"/>
+        <text x="462" y="325" fill="#7a8fa6" font-size="13" font-style="italic" font-family="serif">Y</text>
+        <text x="38"  y="16"  fill="#7a8fa6" font-size="13" font-style="italic" font-family="serif">i</text>
+        <line x1="75"  y1="305" x2="420" y2="55" stroke="#f78166" stroke-width="2.5"/>
+        <text x="424" y="53" fill="#f78166" font-size="14" font-family="serif" font-weight="bold">LM</text>
+        <line x1="80"  y1="55"  x2="390" y2="305" stroke="#58a6ff" stroke-width="2" opacity=".4" stroke-dasharray="8,5"/>
+        <text x="392" y="310" fill="#58a6ff" font-size="12" font-family="serif" opacity=".55">IS₀</text>
+        <line x1="155" y1="55"  x2="450" y2="305" stroke="#58a6ff" stroke-width="2.5"/>
+        <text x="452" y="310" fill="#58a6ff" font-size="13" font-family="serif" font-weight="bold">IS₁</text>
+        <line x1="260" y1="180" x2="318" y2="180" stroke="#58a6ff" stroke-width="1.5" marker-end="url(#s1b)" opacity=".7"/>
+        <circle cx="241" cy="185" r="5" fill="#3d4f61" stroke="#e3b341" stroke-width="1.5"/>
+        <text x="247" y="181" fill="#e3b341" font-size="11" font-style="italic" font-family="serif" opacity=".7">E₀</text>
+        <line x1="55"  y1="185" x2="241" y2="185" stroke="#e3b341" stroke-width="1" stroke-dasharray="4,3" opacity=".45"/>
+        <line x1="241" y1="185" x2="241" y2="320" stroke="#e3b341" stroke-width="1" stroke-dasharray="4,3" opacity=".45"/>
+        <text x="18"  y="189" fill="#e3b341" font-size="11" font-style="italic" font-family="serif" opacity=".7">i₀</text>
+        <text x="229" y="333" fill="#e3b341" font-size="11" font-style="italic" font-family="serif" opacity=".7">Y₀</text>
+        <circle cx="281" cy="157" r="6" fill="#e3b341"/>
+        <text x="287" y="152" fill="#e3b341" font-size="12" font-style="italic" font-family="serif">E₁</text>
+        <line x1="55"  y1="157" x2="281" y2="157" stroke="#e3b341" stroke-width="1.5" stroke-dasharray="4,3"/>
+        <line x1="281" y1="157" x2="281" y2="320" stroke="#e3b341" stroke-width="1.5" stroke-dasharray="4,3"/>
+        <text x="18"  y="161" fill="#e3b341" font-size="11" font-style="italic" font-family="serif">i₁</text>
+        <text x="269" y="333" fill="#e3b341" font-size="11" font-style="italic" font-family="serif">Y₁</text>
+        <rect x="64" y="34" width="78" height="22" rx="3" fill="#0b0f14" stroke="#232d3a"/>
+        <text x="70" y="49" fill="#3fb950" font-size="11" font-family="serif" font-weight="bold">Y ↑   i ↑</text>
+        </svg>
+      </div>
+      <div class="shift-card-body">
+        <div class="cause">Príčiny: ↑ G, ↓ T, ↑ autonómne investície</div>
+        <div class="effect">IS sa posúva doprava → nová rovnováha E₁ s vyšším Y aj i.</div>
+        <p style="font-size:11px;color:var(--muted);margin:0;"><strong>Crowding out:</strong> vyššie i obmedzuje súkromné investície.</p>
+      </div>
+    </div>
+
+    <!-- IS ← -->
+    <div class="shift-card">
+      <div class="shift-card-hdr is-hdr">
+        IS ← doľava — Kontrakčná fiškálna politika
+        <span class="rbadge down" style="margin:0;font-size:10px;padding:2px 8px;">Y↓ i↓</span>
+      </div>
+      <div class="shift-card-svg">
+        <svg viewBox="0 0 480 360" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <marker id="s2"  markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#3d4f61"/></marker>
+          <marker id="s2b" markerWidth="7" markerHeight="5" refX="7" refY="2.5" orient="auto"><polygon points="0 0,7 2.5,0 5" fill="#58a6ff"/></marker>
+        </defs>
+        <line x1="55" y1="320" x2="460" y2="320" stroke="#3d4f61" stroke-width="1.5" marker-end="url(#s2)"/>
+        <line x1="55" y1="320" x2="55" y2="20"  stroke="#3d4f61" stroke-width="1.5" marker-end="url(#s2)"/>
+        <text x="462" y="325" fill="#7a8fa6" font-size="13" font-style="italic" font-family="serif">Y</text>
+        <text x="38"  y="16"  fill="#7a8fa6" font-size="13" font-style="italic" font-family="serif">i</text>
+        <line x1="75"  y1="305" x2="420" y2="55"  stroke="#f78166" stroke-width="2.5"/>
+        <text x="424" y="53" fill="#f78166" font-size="14" font-family="serif" font-weight="bold">LM</text>
+        <line x1="155" y1="55"  x2="450" y2="305" stroke="#58a6ff" stroke-width="2" opacity=".4" stroke-dasharray="8,5"/>
+        <text x="452" y="310" fill="#58a6ff" font-size="12" font-family="serif" opacity=".55">IS₀</text>
+        <line x1="80"  y1="55"  x2="390" y2="305" stroke="#58a6ff" stroke-width="2.5"/>
+        <text x="392" y="310" fill="#58a6ff" font-size="13" font-family="serif" font-weight="bold">IS₁</text>
+        <line x1="318" y1="180" x2="262" y2="180" stroke="#58a6ff" stroke-width="1.5" marker-end="url(#s2b)" opacity=".7"/>
+        <circle cx="281" cy="157" r="5" fill="#3d4f61" stroke="#e3b341" stroke-width="1.5"/>
+        <text x="287" y="152" fill="#e3b341" font-size="11" font-style="italic" font-family="serif" opacity=".7">E₀</text>
+        <line x1="55"  y1="157" x2="281" y2="157" stroke="#e3b341" stroke-width="1" stroke-dasharray="4,3" opacity=".4"/>
+        <line x1="281" y1="157" x2="281" y2="320" stroke="#e3b341" stroke-width="1" stroke-dasharray="4,3" opacity=".4"/>
+        <text x="18"  y="161" fill="#e3b341" font-size="11" font-style="italic" font-family="serif" opacity=".7">i₀</text>
+        <text x="269" y="333" fill="#e3b341" font-size="11" font-style="italic" font-family="serif" opacity=".7">Y₀</text>
+        <circle cx="241" cy="185" r="6" fill="#e3b341"/>
+        <text x="218" y="181" fill="#e3b341" font-size="12" font-style="italic" font-family="serif">E₁</text>
+        <line x1="55"  y1="185" x2="241" y2="185" stroke="#e3b341" stroke-width="1.5" stroke-dasharray="4,3"/>
+        <line x1="241" y1="185" x2="241" y2="320" stroke="#e3b341" stroke-width="1.5" stroke-dasharray="4,3"/>
+        <text x="18"  y="189" fill="#e3b341" font-size="11" font-style="italic" font-family="serif">i₁</text>
+        <text x="229" y="333" fill="#e3b341" font-size="11" font-style="italic" font-family="serif">Y₁</text>
+        <rect x="64" y="34" width="78" height="22" rx="3" fill="#0b0f14" stroke="#232d3a"/>
+        <text x="70" y="49" fill="#f97171" font-size="11" font-family="serif" font-weight="bold">Y ↓   i ↓</text>
+        </svg>
+      </div>
+      <div class="shift-card-body">
+        <div class="cause">Príčiny: ↓ G, ↑ T</div>
+        <div class="effect">IS sa posúva doľava → Y ↓, i ↓.</div>
+        <p style="font-size:11px;color:var(--muted);margin:0;"><strong>Crowding in:</strong> nižšie i čiastočne kompenzuje pokles.</p>
+      </div>
+    </div>
+
+    <!-- LM → -->
+    <div class="shift-card">
+      <div class="shift-card-hdr lm-hdr">
+        LM → doprava — Expanzívna monetárna politika
+        <span class="rbadge up" style="margin:0;font-size:10px;padding:2px 8px;">Y↑ i↓</span>
+      </div>
+      <div class="shift-card-svg">
+        <svg viewBox="0 0 480 360" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <marker id="s3"  markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#3d4f61"/></marker>
+          <marker id="s3r" markerWidth="7" markerHeight="5" refX="7" refY="2.5" orient="auto"><polygon points="0 0,7 2.5,0 5" fill="#f78166"/></marker>
+        </defs>
+        <line x1="55" y1="320" x2="460" y2="320" stroke="#3d4f61" stroke-width="1.5" marker-end="url(#s3)"/>
+        <line x1="55" y1="320" x2="55" y2="20"  stroke="#3d4f61" stroke-width="1.5" marker-end="url(#s3)"/>
+        <text x="462" y="325" fill="#7a8fa6" font-size="13" font-style="italic" font-family="serif">Y</text>
+        <text x="38"  y="16"  fill="#7a8fa6" font-size="13" font-style="italic" font-family="serif">i</text>
+        <line x1="90"  y1="55"  x2="420" y2="305" stroke="#58a6ff" stroke-width="2.5"/>
+        <text x="424" y="308" fill="#58a6ff" font-size="14" font-family="serif" font-weight="bold">IS</text>
+        <line x1="75"  y1="305" x2="420" y2="55"  stroke="#f78166" stroke-width="2" opacity=".4" stroke-dasharray="8,5"/>
+        <text x="424" y="53" fill="#f78166" font-size="12" font-family="serif" opacity=".55">LM₀</text>
+        <line x1="155" y1="305" x2="455" y2="80"  stroke="#f78166" stroke-width="2.5"/>
+        <text x="456" y="78" fill="#f78166" font-size="13" font-family="serif" font-weight="bold">LM₁</text>
+        <line x1="240" y1="195" x2="298" y2="195" stroke="#f78166" stroke-width="1.5" marker-end="url(#s3r)" opacity=".7"/>
+        <circle cx="251" cy="177" r="5" fill="#3d4f61" stroke="#e3b341" stroke-width="1.5"/>
+        <text x="257" y="172" fill="#e3b341" font-size="11" font-style="italic" font-family="serif" opacity=".7">E₀</text>
+        <line x1="55"  y1="177" x2="251" y2="177" stroke="#e3b341" stroke-width="1" stroke-dasharray="4,3" opacity=".4"/>
+        <line x1="251" y1="177" x2="251" y2="320" stroke="#e3b341" stroke-width="1" stroke-dasharray="4,3" opacity=".4"/>
+        <text x="18"  y="181" fill="#e3b341" font-size="11" font-style="italic" font-family="serif" opacity=".7">i₀</text>
+        <text x="239" y="333" fill="#e3b341" font-size="11" font-style="italic" font-family="serif" opacity=".7">Y₀</text>
+        <circle cx="290" cy="207" r="6" fill="#e3b341"/>
+        <text x="296" y="202" fill="#e3b341" font-size="12" font-style="italic" font-family="serif">E₁</text>
+        <line x1="55"  y1="207" x2="290" y2="207" stroke="#e3b341" stroke-width="1.5" stroke-dasharray="4,3"/>
+        <line x1="290" y1="207" x2="290" y2="320" stroke="#e3b341" stroke-width="1.5" stroke-dasharray="4,3"/>
+        <text x="18"  y="211" fill="#e3b341" font-size="11" font-style="italic" font-family="serif">i₁</text>
+        <text x="278" y="333" fill="#e3b341" font-size="11" font-style="italic" font-family="serif">Y₁</text>
+        <rect x="64" y="34" width="78" height="22" rx="3" fill="#0b0f14" stroke="#232d3a"/>
+        <text x="70" y="49" fill="#3fb950" font-size="11" font-family="serif" font-weight="bold">Y ↑   i ↓</text>
+        </svg>
+      </div>
+      <div class="shift-card-body">
+        <div class="cause">Príčiny: CB ↑ M (nákup dlhopisov, zníženie PMR)</div>
+        <div class="effect">↑ M/P → i klesá → I ↑ → multiplikátor zvyšuje Y.</div>
+      </div>
+    </div>
+
+    <!-- LM ← -->
+    <div class="shift-card">
+      <div class="shift-card-hdr lm-hdr">
+        LM ← doľava — Kontrakčná monetárna politika
+        <span class="rbadge down" style="margin:0;font-size:10px;padding:2px 8px;">Y↓ i↑</span>
+      </div>
+      <div class="shift-card-svg">
+        <svg viewBox="0 0 480 360" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <marker id="s4"  markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#3d4f61"/></marker>
+          <marker id="s4r" markerWidth="7" markerHeight="5" refX="7" refY="2.5" orient="auto"><polygon points="0 0,7 2.5,0 5" fill="#f78166"/></marker>
+        </defs>
+        <line x1="55" y1="320" x2="460" y2="320" stroke="#3d4f61" stroke-width="1.5" marker-end="url(#s4)"/>
+        <line x1="55" y1="320" x2="55" y2="20"  stroke="#3d4f61" stroke-width="1.5" marker-end="url(#s4)"/>
+        <text x="462" y="325" fill="#7a8fa6" font-size="13" font-style="italic" font-family="serif">Y</text>
+        <text x="38"  y="16"  fill="#7a8fa6" font-size="13" font-style="italic" font-family="serif">i</text>
+        <line x1="90"  y1="55"  x2="420" y2="305" stroke="#58a6ff" stroke-width="2.5"/>
+        <text x="424" y="308" fill="#58a6ff" font-size="14" font-family="serif" font-weight="bold">IS</text>
+        <line x1="155" y1="305" x2="455" y2="80"  stroke="#f78166" stroke-width="2" opacity=".4" stroke-dasharray="8,5"/>
+        <text x="456" y="78" fill="#f78166" font-size="12" font-family="serif" opacity=".55">LM₀</text>
+        <line x1="75"  y1="305" x2="420" y2="55"  stroke="#f78166" stroke-width="2.5"/>
+        <text x="424" y="53" fill="#f78166" font-size="13" font-family="serif" font-weight="bold">LM₁</text>
+        <line x1="298" y1="195" x2="242" y2="195" stroke="#f78166" stroke-width="1.5" marker-end="url(#s4r)" opacity=".7"/>
+        <circle cx="290" cy="207" r="5" fill="#3d4f61" stroke="#e3b341" stroke-width="1.5"/>
+        <text x="296" y="202" fill="#e3b341" font-size="11" font-style="italic" font-family="serif" opacity=".7">E₀</text>
+        <line x1="55"  y1="207" x2="290" y2="207" stroke="#e3b341" stroke-width="1" stroke-dasharray="4,3" opacity=".4"/>
+        <line x1="290" y1="207" x2="290" y2="320" stroke="#e3b341" stroke-width="1" stroke-dasharray="4,3" opacity=".4"/>
+        <text x="18"  y="211" fill="#e3b341" font-size="11" font-style="italic" font-family="serif" opacity=".7">i₀</text>
+        <text x="278" y="333" fill="#e3b341" font-size="11" font-style="italic" font-family="serif" opacity=".7">Y₀</text>
+        <circle cx="251" cy="177" r="6" fill="#e3b341"/>
+        <text x="226" y="172" fill="#e3b341" font-size="12" font-style="italic" font-family="serif">E₁</text>
+        <line x1="55"  y1="177" x2="251" y2="177" stroke="#e3b341" stroke-width="1.5" stroke-dasharray="4,3"/>
+        <line x1="251" y1="177" x2="251" y2="320" stroke="#e3b341" stroke-width="1.5" stroke-dasharray="4,3"/>
+        <text x="18"  y="181" fill="#e3b341" font-size="11" font-style="italic" font-family="serif">i₁</text>
+        <text x="239" y="333" fill="#e3b341" font-size="11" font-style="italic" font-family="serif">Y₁</text>
+        <rect x="64" y="34" width="78" height="22" rx="3" fill="#0b0f14" stroke="#232d3a"/>
+        <text x="70" y="49" fill="#f97171" font-size="11" font-family="serif" font-weight="bold">Y ↓   i ↑</text>
+        </svg>
+      </div>
+      <div class="shift-card-body">
+        <div class="cause">Príčiny: CB ↓ M (predaj dlhopisov, zvýšenie PMR)</div>
+        <div class="effect">LM sa posúva doľava → Y ↓, i ↑.</div>
+        <p style="font-size:11px;color:var(--muted);margin:0;">Používa sa na boj s infláciou.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Summary text cards -->
+  <div class="cols-4" style="margin-top:20px;">
+    <div class="sc is">
+      <h4>IS → Doprava — Expanzívna fiškálna</h4>
+      <p>Príčiny: ↑ G, ↓ T, ↑ autonómne investície.<br>Efekt: <strong>Y ↑, i ↑</strong><br>Crowding out: vyššie i obmedzuje súkromné investície.</p>
+    </div>
+    <div class="sc is">
+      <h4>IS ← Doľava — Kontrakčná fiškálna</h4>
+      <p>Príčiny: ↓ G, ↑ T.<br>Efekt: <strong>Y ↓, i ↓</strong><br>Nižšie i čiastočne kompenzuje pokles cez crowding in.</p>
+    </div>
+    <div class="sc lm">
+      <h4>LM → Doprava — Expanzívna monetárna</h4>
+      <p>Príčiny: CB ↑ M (nákup dlhopisov, zníženie PMR).<br>Efekt: <strong>Y ↑, i ↓</strong><br>↑ M/P → i klesá → I ↑ → multiplikátor zvyšuje Y.</p>
+    </div>
+    <div class="sc lm">
+      <h4>LM ← Doľava — Kontrakčná monetárna</h4>
+      <p>Príčiny: CB ↓ M (predaj dlhopisov, zvýšenie PMR).<br>Efekt: <strong>Y ↓, i ↑</strong><br>Používa sa na boj s infláciou.</p>
+    </div>
+  </div>
+
+  <div class="kp" style="margin-top:20px;">
+    <strong>Fiškálna vs. Monetárna politika:</strong> Obidve pri expanzii zvyšujú Y. Ale fiškálna tlačí <em>i nahor</em> (crowding out), kým monetárna tlačí <em>i nadol</em> (stimuluje investície). Fiškálna politika je silnejšia pri horizontálnej LM (likviditná pasca), monetárna pri vertikálnej LM (klasický prípad).
+  </div>
+
+</section>
+
+</div><!-- /islm-main -->
+<footer>Makroekonomické modely · IS-LM-BP · Model výdaje-důchod · Keynesiánský kríž · OPF SLU</footer>
+</div><!-- /page-islm -->
+
+
+<script>
+// ─── AE section switcher ──────────────────────────
+const sections = ['c','i','g','nx'];
+let active = null;
+
+function activateSection(id) {
+  if (active === id) { resetAE(); return; }
+  // clear all
+  sections.forEach(s => {
+    document.querySelector(`.ae-block[data-id="${s}"]`).classList.remove('active');
+    document.getElementById(`panel-${s}`).classList.remove('active');
+  });
+  document.getElementById('panel-default').classList.remove('active');
+  // activate
+  document.querySelector(`.ae-block[data-id="${id}"]`).classList.add('active');
+  document.getElementById(`panel-${id}`).classList.add('active');
+  active = id;
+}
+
+function resetAE() {
+  sections.forEach(s => {
+    document.querySelector(`.ae-block[data-id="${s}"]`).classList.remove('active');
+    document.getElementById(`panel-${s}`).classList.remove('active');
+  });
+  document.getElementById('panel-default').classList.add('active');
+  active = null;
+}
+
+// ─── Tab switching ────────────────────────────────
+function switchView(view) {
+  document.querySelectorAll('.page-view').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById(`page-${view}`).classList.add('active');
+  document.getElementById(`tab-${view}`).classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+</script>
+</body>
+</html>
