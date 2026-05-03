@@ -486,6 +486,13 @@ body {
 .fmla.bp  { border-left-color: var(--bp); }
 .fmla.eq  { border-left-color: var(--eq); }
 
+.text-ae { color: var(--is); font-weight: 600; }
+.text-ae-dash { color: var(--is); font-weight: 600; opacity: .94; }
+.text-c { color: #f59e0b; font-weight: 600; }
+.text-a { color: #c678dd; font-weight: 600; }
+.text-45 { color: #7a8fa6; font-weight: 600; }
+.text-yd { color: #79c0ff; font-weight: 600; }
+
 /* step cards — replaces dense paragraphs */
 .steps {
   display: flex;
@@ -949,32 +956,31 @@ body {
       </div>
     </div>
     <div>
-      <h3>Čo graf ukazuje?</h3>
-      <p>Porovnáva plánované výdavky (AE) s reálnym výstupom (Y). Rovnováha nastáva, kde sa AE krivka pretína s 45° líniou.</p>
-      <div class="fmla">AE = Ca + Ja + c · YD</div>
+      <h3>Osi grafu</h3>
+      <p><strong>Vodorovná os (<span class="text-45">Y</span>):</strong> reálny výstup alebo celkový dôchodok ekonomiky. Znamená to, koľko tovarov a služieb firmy vyrobia a koľko peňazí za to ľudia zarobia.</p>
+      <p><strong>Zvislá os (<span class="text-45">AD</span>):</strong> agregátne výdavky. Je to, koľko peňazí chcú domácnosti a firmy v danom okamihu minúť.</p>
 
-      <div class="steps">
-        <div class="step">
-          <div class="step-num">45°</div>
-          <div class="step-body"><strong>Každý bod na 45° línii splňuje Y = AD.</strong> Ide o všetky možné body rovnováhy — ekonomika sa vždy pohybuje smerom k tejto línii.</div>
-        </div>
-        <div class="step">
-          <div class="step-num">↑ AE</div>
-          <div class="step-body"><strong>Nad líniou (AE &gt; Y):</strong> firmy nestíhajú dopyt, zásoby klesajú → produkcia rastie smerom k E₀.</div>
-        </div>
-        <div class="step">
-          <div class="step-num">↓ AE</div>
-          <div class="step-body"><strong>Pod líniou (AE &lt; Y):</strong> výroba prevyšuje predaj → zásoby rastú → Y klesá.</div>
-        </div>
-      </div>
+      <h3>Čiary v grafe</h3>
+      <p><strong><span class="text-45">45° línia (Y = AD):</span></strong> ideálna rovnováha. V každom bode tejto čiary platí, že hodnota na vodorovnej osi sa presne rovná hodnote na zvislej osi. Výroba sa rovná plánovaným výdavkom.</p>
+      <p><strong><span class="text-ae">Plná modrá čiara (AE):</span></strong> skutočné plánované agregátne výdavky. Vzniká z kombinácie <span class="text-c">spotreby domácností</span> a <span class="text-a">fixných investícií firiem</span>. Je rovnobežná so spotrebnou funkciou, ale začína vyššie o autonómne investície (<span class="text-a">Ja</span>).</p>
+      <p><strong><span class="text-ae-dash">Prerušovaná modrá čiara (AE'):</span></strong> ukazuje nový vyšší objem výdavkov po exogénnom stimule, napríklad pri zvýšení investícií firiem.</p>
+
+      <h3>Ako graf funguje</h3>
+      <p><strong>Bod <span class="text-yd">E₀</span>:</strong> rovnováha, kde sa <span class="text-ae">AE</span> pretína so <span class="text-45">45°</span> líniou. Pri výkone <span class="text-yd">Y₀</span> firmy plánujú minúť presne toľko, koľko vyrobili, a zásoby sa nemenia.</p>
+      <p><strong>Bod <span class="text-yd">E₁</span> pri <span class="text-yd">Y₁</span>:</strong> ak je <span class="text-ae">AE</span> nad <span class="text-45">45°</span> líniou, dopyt prevyšuje výrobu. Firmy strácajú zásoby a začnú vyrábať viac. Výstup sa preto pohybuje doprava smerom k <span class="text-yd">Y₀</span>.</p>
+      <p><strong>Vpravo od <span class="text-yd">Y₀</span>:</strong> ak je <span class="text-yd">Y</span> väčšie ako <span class="text-yd">Y₀</span>, <span class="text-ae">AE</span> leží pod <span class="text-45">45°</span> líniou. Výroba prevyšuje predaj, zásoby rastú a firmy znižujú výrobu, takže <span class="text-yd">Y</span> sa vracia späť k <span class="text-yd">Y₀</span>.</p>
+
+      <h3>Posun <span class="text-ae">AE</span></h3>
+      <p>Ak do ekonomiky príde stimul, napríklad firmy zvýšia <span class="text-a">fixné investície</span>, celá <span class="text-ae">AE</span> krivka sa posunie nahor na <span class="text-ae-dash">AE'</span>. Starý bod <span class="text-yd">E₀</span> už nie je rovnováha.</p>
+      <p>Nová rovnováha sa vytvorí v bode <span class="text-yd">E₂</span> pri vyššom výstupe <span class="text-yd">Y₂</span>. Vyššie plánované výdavky znamenajú vyšší celkový výkon ekonomiky.</p>
 
       <h3>Multiplikátor</h3>
       <p>Každé jedno euro navyše v autonómnych výdajoch zvýši Y o viac než 1 €.</p>
       <div class="fmla">k = 1 / (1 − c)</div>
-      <div class="kp"><strong>Príklad:</strong> Pri c = 0,6 → k = 2,5. Každých +€1 v autonómnych výdajoch → +€2,50 v Y.</div>
+      <div class="kp"><strong>Príklad:</strong> pri c = 0,6 je k = 2,5. To znamená, že +€1 v autonómnych výdajoch zvýši Y o +€2,50.</div>
 
-      <h3>Čo posúva AE nahor?</h3>
-      <p>↑ G, ↓ T, ↑ Ca, ↑ Ja — všetko posunie celú AE líniu nahor → nový rovnovážny výstup Y₂.</p>
+      <h3>Čo posúva <span class="text-ae">AE</span> nahor?</h3>
+      <p>Zvýšenie G, zníženie T, rast autonómnej spotreby (<span class="text-c">Ca</span>) alebo rast fixných investícií (<span class="text-a">Ja</span>) posunie celú <span class="text-ae">AE</span> líniu nahor a vytvorí vyšší rovnovážny výstup <span class="text-yd">Y₂</span>.</p>
     </div>
   </div>
 </section>
